@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Barber 💈</title>
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff0000, #ffffff, #0000ff);
+            background-size: 300% 300%;
+            animation: bgMove 6s infinite alternate;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Chat Container */
+        .chat-container {
+            width: 400px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Barber Pole Header */
+        .header {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, red, white, blue);
+            width: 120px;
+            height: 20px;
+            border-radius: 10px;
+        }
+
+        /* Chat Box */
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px solid #0000ff;
+            border-radius: 5px;
+            background: #f8f8f8;
+        }
+
+        /* Messages */
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background-color: #ff0000;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot {
+            background-color: #0000ff;
+            color: white;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        /* Input and Button */
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input {
+            border: 2px solid #0000ff;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff0000, #0000ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #0000ff, #ff0000);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="header"></div>
+        <h1 style="color: #000;">💈 ChatGPT Barber 💈</h1>
+        <div class="chat-box" id="chatBox"></div>
+        <input type="text" id="userInput" placeholder="Ask about hairstyles...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            let input = document.getElementById("userInput").value;
+            if (!input.trim()) return;
+
+            let chatBox = document.getElementById("chatBox");
+
+            // Add user message
+            let userMessage = document.createElement("p");
+            userMessage.textContent = input;
+            userMessage.className = "message user";
+            chatBox.appendChild(userMessage);
+
+            // Clear input
+            document.getElementById("userInput").value = "";
+
+            try {
+                let response = await fetch("http://localhost:8000/chat/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: input }),
+                });
+
+                let data = await response.json();
+                let botResponse = data.candidates[0].content || "Sorry, I didn't understand.";
+
+                // Add bot message
+                let botMessage = document.createElement("p");
+                botMessage.textContent = botResponse;
+                botMessage.className = "message bot";
+                chatBox.appendChild(botMessage);
+
+                // Scroll down
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    </script>
+
+</body>
+</html>
+

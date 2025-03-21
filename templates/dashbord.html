@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber Shop Dashboard 💈</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff0000, #ffffff, #0000ff);
+            background-size: 300% 300%;
+            animation: bgMove 6s infinite alternate;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            width: 80%;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Header Barber Pole */
+        .header {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, red, white, blue);
+            width: 200px;
+            height: 20px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #000;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #f8f8f8;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: linear-gradient(45deg, #ff0000, #0000ff);
+            color: white;
+        }
+
+        /* Contact Button */
+        .contact-btn {
+            background: linear-gradient(45deg, #ff0000, #0000ff);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .contact-btn:hover {
+            background: linear-gradient(45deg, #0000ff, #ff0000);
+        }
+
+        /* Emotion Colors */
+        .happy { color: green; }
+        .neutral { color: orange; }
+        .sad { color: red; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header"></div>
+        <h1>💈 Barber Shop Conversations Dashboard 💈</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Contact</th>
+                    <th>Emotion</th>
+                    <th>Conversation Summary</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="conversationTable">
+                <!-- Dynamic data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Dummy data (this should be replaced by fetching from API)
+        const conversations = [
+            { name: "John Doe", contact: "+123456789", emotion: "😊 Happy", summary: "Discussed haircuts and beard styling.", emotionClass: "happy" },
+            { name: "Jane Smith", contact: "+987654321", emotion: "😐 Neutral", summary: "Asked about appointment availability.", emotionClass: "neutral" },
+            { name: "Mike Johnson", contact: "+112233445", emotion: "😞 Sad", summary: "Unhappy with last haircut, wants a fix.", emotionClass: "sad" }
+        ];
+
+        function loadConversations() {
+            let table = document.getElementById("conversationTable");
+            table.innerHTML = "";
+
+            conversations.forEach(conv => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${conv.name}</td>
+                    <td>${conv.contact}</td>
+                    <td class="${conv.emotionClass}">${conv.emotion}</td>
+                    <td>${conv.summary}</td>
+                    <td><a href="whatsapp"><button class="contact-btn">Contact</button></a></td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function contactUser(contact) {
+            alert(`Contacting ${contact}...`);
+        }
+
+        // Load data on page load
+        loadConversations();
+    </script>
+
+</body>
+</html>
