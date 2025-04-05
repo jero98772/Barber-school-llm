@@ -8,28 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const sessionId = 'session_' + Date.now();
     
     // Function to add a message to the chat
-    function addMessage(content, isUser) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        
-        const header = document.createElement('div');
-        header.className = 'message-header';
-        header.textContent = isUser ? 'You' : 'Bot';
-        
-        const messageContent = document.createElement('div');
-        messageContent.className = 'message-content';
-        messageContent.textContent = content;
-        
-        messageDiv.appendChild(header);
-        messageDiv.appendChild(messageContent);
-        chatContainer.appendChild(messageDiv);
-        
-        // Scroll to the bottom of the chat
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        
-        return messageContent; // Return for streaming updates
-    }
+  function addMessage(content, isUser) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`; // Clases actualizadas
     
+    const header = document.createElement('div');
+    header.className = 'message-header';
+    header.textContent = isUser ? 'You' : 'Bot';
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    messageContent.textContent = content;
+    
+    messageDiv.appendChild(header);
+    messageDiv.appendChild(messageContent);
+    chatContainer.appendChild(messageDiv);
+    
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    return messageContent;
+}   
     // Function to create a streaming bot message
     function createStreamingMessage() {
         const botMessageContent = addMessage('', false);
@@ -142,3 +140,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load history when page loads
     loadHistory();
 });
+
+

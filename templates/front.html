@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABC Barber's 💈</title>
+    <title>💈 ABC Barber's Chat 💈</title>
     <style>
         /* General Page Styling */
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff0000, #ffffff, #0000ff);
+            background: linear-gradient(135deg, #ff0000, #ffffff, #000000);
             background-size: 300% 300%;
             animation: bgMove 6s infinite alternate;
             text-align: center;
             color: white;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            min-height: 100vh;
         }
 
         @keyframes bgMove {
@@ -24,7 +25,8 @@
 
         /* Chat Container */
         .chat-container {
-            width: 400px;
+            width: 90%;
+            max-width: 800px;
             margin: 50px auto;
             background: #ffffff;
             border-radius: 10px;
@@ -39,27 +41,28 @@
             top: -10px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(45deg, red, white, blue);
+            background: linear-gradient(45deg, red, white, black);
             width: 120px;
             height: 20px;
             border-radius: 10px;
         }
 
         /* Chat Box */
-        .chat-box {
-            height: 300px;
+        #chat-container {
+            height: 60vh;
             overflow-y: auto;
-            padding: 10px;
-            border: 2px solid #0000ff;
+            padding: 20px;
+            border: 2px solid #000000;
             border-radius: 5px;
             background: #f8f8f8;
+            margin-bottom: 20px;
         }
 
         /* Messages */
         .message {
             margin: 10px 0;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
             max-width: 80%;
             word-wrap: break-word;
         }
@@ -67,94 +70,119 @@
         .user {
             background-color: #ff0000;
             color: white;
-            align-self: flex-end;
+            margin-left: auto;
             text-align: right;
         }
 
         .bot {
-            background-color: #0000ff;
+            background-color: #000000;
             color: white;
-            align-self: flex-start;
+            margin-right: auto;
             text-align: left;
         }
 
         /* Input and Button */
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: none;
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #000000 !important;
             border-radius: 5px;
             font-size: 16px;
         }
 
-        input {
-            border: 2px solid #0000ff;
-        }
-
         button {
-            background: linear-gradient(45deg, #ff0000, #0000ff);
+            background: linear-gradient(45deg, #ff0000, #000000);
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 25px;
         }
 
         button:hover {
-            background: linear-gradient(45deg, #0000ff, #ff0000);
+            background: linear-gradient(45deg, #000000, #ff0000);
+        }
+
+        .card-footer {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-
     <div class="chat-container">
         <div class="header"></div>
-        <h1 style="color: #000;">💈 ABC Barber's 💈</h1>
-        <div class="chat-box" id="chatBox"></div>
-        <input type="text" id="userInput" placeholder="Pregunta de nuestros cursos...">
-        <button onclick="sendMessage()">Send</button>
+        <h1 style="color: #000;">💈 ABC Barber's Chat 💈</h1>
+        
+        <div id="chat-container">
+            <!-- Chat messages will appear here -->
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="Ask about our services...">
+            <button id="send-btn">Send</button>
+        </div>
+
+        <div class="mt-3">
+            <button id="clear-btn" class="btn-outline">Clear Chat</button>
+        </div>
+
+        <div class="card-footer">
+            <small>Model: TheBloke/dolphin-2.2.1-mistral-7B-GGUF</small>
+        </div>
     </div>
 
     <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        async function addMessage(message, isUser = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
         async function sendMessage() {
-            let input = document.getElementById("userInput").value;
-            if (!input.trim()) return;
+            const message = userInput.value.trim();
+            if (!message) return;
 
-            let chatBox = document.getElementById("chatBox");
-
-            // Add user message
-            let userMessage = document.createElement("p");
-            userMessage.textContent = input;
-            userMessage.className = "message user";
-            chatBox.appendChild(userMessage);
-
-            // Clear input
-            document.getElementById("userInput").value = "";
+            addMessage(message, true);
+            userInput.value = '';
 
             try {
-                let response = await fetch("http://localhost:8000/chat/", {
+                const response = await fetch("http://localhost:8000/chat/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: input }),
+                    body: JSON.stringify({ message }),
                 });
 
-                let data = await response.json();
-                let botResponse = data.candidates[0].content || "Sorry, I didn't understand.";
-
-                // Add bot message
-                let botMessage = document.createElement("p");
-                botMessage.textContent = botResponse;
-                botMessage.className = "message bot";
-                chatBox.appendChild(botMessage);
-
-                // Scroll down
-                chatBox.scrollTop = chatBox.scrollHeight;
+                const data = await response.json();
+                const botResponse = data.candidates[0].content || "Sorry, I didn't understand that.";
+                addMessage(botResponse, false);
             } catch (error) {
                 console.error("Error:", error);
+                addMessage("There was an error processing your request.", false);
             }
         }
-    </script>
 
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+        clearBtn.addEventListener('click', () => {
+            chatContainer.innerHTML = '';
+        });
+    </script>
 </body>
 </html>
-
