@@ -9,6 +9,8 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from textblob import TextBlob
+
 
 load_dotenv()  
 
@@ -37,6 +39,23 @@ def read_txt_file(filename):
         return content
     except FileNotFoundError:
         return f"File '{filename}' not found."
+
+def sentiment_analizis(texto):
+    """
+    python -m textblob.download_corpora
+
+    """
+    blob = TextBlob(texto)
+    probability = blob.sentiment.polarity
+
+    if probability > 0.1:
+        sentiment = "Positivo 😊"
+    elif probability < -0.1:
+        sentiment = "Negativo 😠"
+    else:
+        sentiment = "Neutro 😐"
+
+    return sentiment
 
 
 def chat_answer(messages):
@@ -88,6 +107,11 @@ async def chat_answer_gemini(messages):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("dashboard.html", {"request": request})
+
 
 @app.post("/chat")
 async def chat(request: Request):
