@@ -71,7 +71,10 @@ def chat_answer(messages):
 chat_history = {
     "chat1": [
         {"role": "user", "content": "Hello"},
-        {"role": "assistant", "content": read_txt_file(KNOWLAGEBASE)}
+        {"role": "assistant", "content": read_txt_file(KNOWLAGEBASE)},
+        {"role": "system", "content": "Eres un vendedor profecional tu vida depende de la venta de estos cursos, responde solamente con la informacion proporcionad"}
+        {"role": "system", "content": "Cuando el usuario este satisfecho pide le su numero telefonoci para contactarlo, ciudad, nombre y observaciones"}
+
     ]
 }
 
