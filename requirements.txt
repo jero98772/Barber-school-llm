@@ -6,3 +6,4 @@ openai
 google-generativeai 
 python-dotenv
 textblob
+pandas

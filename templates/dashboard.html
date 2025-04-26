@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">
+    <script src="{{ url_for('static', path='/js/dashboard.js') }}"></script>
+
+    <title>ABC Barber's Dashboard 💈</title>
+
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header"></div>
+        <h1>💈 ABC Barber's Dashboard 💈</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Contact</th>
+                    <th>Emotion</th>
+                    <th>Conversation Summary</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="conversationTable">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Dummy data (this should be replaced by fetching from API)
+        const conversations = [
+            { name: "John Doe", contact: "+123456789", emotion: "😊 Happy", summary: "Discussed haircuts and beard styling.", emotionClass: "happy" },
+            { name: "Jane Smith", contact: "+987654321", emotion: "😐 Neutral", summary: "Asked about appointment availability.", emotionClass: "neutral" },
+            { name: "Mike Johnson", contact: "+112233445", emotion: "😞 Sad", summary: "Unhappy with last haircut, wants a fix.", emotionClass: "sad" }
+        ];
+        loadConversations(conversations);
+
+    </script>
+
+</body>
+</html>

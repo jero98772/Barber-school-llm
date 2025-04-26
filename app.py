@@ -22,13 +22,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates
 templates = Jinja2Templates(directory="templates")
 
-# Initialize OpenAI client
-client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "your-gemini-api-key-here")
 genai.configure(api_key=GEMINI_API_KEY)
 
 KNOWLAGEBASE="docs/SchoolInformation.txt"
+
 
 def read_txt_file(filename):
     """Reads and returns the content of a text file."""
@@ -57,6 +56,15 @@ def sentiment_analizis(texto):
 
     return sentiment
 
+chat_history = {
+    "chat1": [
+        {"role": "user", "content": "Hello"},
+        {"role": "assistant", "content": read_txt_file(KNOWLAGEBASE)},
+        {"role": "system", "content": "Eres un vendedor profecional tu vida depende de la venta de estos cursos, responde solamente con la informacion proporcionad"},
+        {"role": "system", "content": "Cuando el usuario este satisfecho pide le su numero telefonoci para contactarlo, ciudad, nombre y observaciones"}
+
+    ]
+}
 
 def chat_answer(messages):
     completion = client.chat.completions.create(
@@ -68,15 +76,6 @@ def chat_answer(messages):
     )
     return completion
 
-chat_history = {
-    "chat1": [
-        {"role": "user", "content": "Hello"},
-        {"role": "assistant", "content": read_txt_file(KNOWLAGEBASE)},
-        {"role": "system", "content": "Eres un vendedor profecional tu vida depende de la venta de estos cursos, responde solamente con la informacion proporcionad"}
-        {"role": "system", "content": "Cuando el usuario este satisfecho pide le su numero telefonoci para contactarlo, ciudad, nombre y observaciones"}
-
-    ]
-}
 
 async def chat_answer_gemini(messages):
     print("gemini")
@@ -105,16 +104,13 @@ async def chat_answer_gemini(messages):
     except Exception as e:
         yield f"Error with Gemini API: {str(e)}"
 
-
-
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def index(request: Request):
+async def dashboard(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
-
 
 @app.post("/chat")
 async def chat(request: Request):
@@ -185,17 +181,6 @@ async def generate_stream(session_id, messages, model="gemini"):
 async def stream_error(error_message):
     yield f"data: {json.dumps({'error': error_message})}\n\n"
 
-@app.get("/history/{session_id}")
-async def get_history(session_id: str):
-    if session_id not in chat_history:
-        return {"history": []}
-    return {"history": chat_history[session_id]}
-
-@app.delete("/history/{session_id}")
-async def clear_history(session_id: str):
-    if session_id in chat_history:
-        chat_history[session_id] = []
-    return {"status": "history cleared"}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
