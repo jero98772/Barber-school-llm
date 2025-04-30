@@ -118,6 +118,7 @@ async def dashboard(request: Request):
 async def chat(request: Request):
     data = await request.json()
     session_id = data.get("session_id")
+    print(session_id)
     message = data.get("message")
     
     # Initialize session if it doesn't exist
@@ -152,10 +153,18 @@ async def contact(request: Request):
     
     # CSV file path
     csv_file = 'data/contacts.csv'
-    
+    session_id = form_data.get("session_id")
+
     # File headers
-    file_headers = ['timestamp', 'session_id', 'name', 'phone', 'city', 'notes']
-    
+    file_headers = ['timestamp', 'session_id', 'name', 'phone', 'city', 'summary', 'sentiment', 'notes']
+
+    get_last_user_message = lambda chat_history, chat_id: next(
+    (msg['content'] for msg in reversed(chat_history.get(chat_id, [])) 
+    if msg['role'] == 'user'), None)
+    chat_history['chat1'].append({"role": "systems", "content": "give me a summary of this conversation of 1 paragrph:"})
+
+    summary = chat_answer_gemini(chat_history)
+    sentiment = sentiment_analizis(get_last_user_message(chat_history, "chat1"))
     # Prepare data for CSV
     record = {
         'timestamp': datetime.now().isoformat(),
@@ -163,6 +172,8 @@ async def contact(request: Request):
         'name': form_data['name'],
         'phone': form_data['phone'],
         'city': form_data['city'],
+        'summary': summary,
+        'sentiment':sentiment ,
         'notes': form_data.get('notes', '')
     }
 
@@ -175,7 +186,6 @@ async def contact(request: Request):
         writer.writerow(record)
 
     # Optional: Add to chat history
-    session_id = form_data['session_id']
     if session_id in chat_history:
         chat_history[session_id].append({
             "role": "system", 

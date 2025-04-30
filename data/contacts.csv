@@ -1,3 +1,3 @@
-timestamp,session_id,name,phone,city,notes
-2025-04-30T15:15:42.954298,session_174604413180862wbq9a9a,pepe,33,medellin,"pene
-"
+timestamp,session_id,name,phone,city,summary,sentiment,notes
+2025-04-30T15:38:08.258248,session_1746045378212577ddivqa,pene,mano,niño,<async_generator object chat_answer_gemini at 0x73c7624c97e0>,Neutro 😐,dd
+2025-04-30T15:41:48.207595,session_17460457006016jy8l6gc5,pepe,314,medellin,<async_generator object chat_answer_gemini at 0x78765021dc60>,Neutro 😐,
