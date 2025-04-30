@@ -112,8 +112,40 @@ async def index(request: Request):
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    conversations = []
+    
+    try:
+        with open('data/contacts.csv', 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            print(reader)
+            # Sentiment to emoji mapping
+            SENTIMENT_MAP = {
+                "Neutro": "😐 Neutral",
+                "Positivo": "😊 Positive",
+                "Negativo": "😞 Negative"
+            }
+            
+            for row in reader:
+                conversations.append({
+                    'name': row['name'],
+                    'contact': f"{row['phone']} ({row['city']})",
+                    'emotion': SENTIMENT_MAP.get(row['sentiment'], "😐 Neutral"),
+                    'summary': row['summary'],
+                    'emotionClass': row['sentiment'].lower().split()[0]
+                })
+            print(conversations)  
+    except FileNotFoundError:
+        print("No contact data found - using empty dataset")
+    except Exception as e:
+        print(f"Error reading CSV: {str(e)}")
 
+    return templates.TemplateResponse(
+        "dashboard.html",
+        {
+            "request": request,
+            "conversations": conversations
+        }
+    )
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()

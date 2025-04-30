@@ -4,21 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{{ url_for('static', path='/js/dashboard.js') }}"></script>
-
     <title>ABC Barber's Dashboard 💈</title>
-
 </head>
 <body>
-
     <div class="dashboard-container">
         <div class="header"></div>
         <h1>💈 ABC Barber's Dashboard 💈</h1>
 
-        <table>
-            <thead>
+        <table class="table table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>Customer Name</th>
                     <th>Contact</th>
@@ -33,15 +29,14 @@
     </div>
 
     <script>
-        // Dummy data (this should be replaced by fetching from API)
-        const conversations = [
-            { name: "John Doe", contact: "+123456789", emotion: "😊 Happy", summary: "Discussed haircuts and beard styling.", emotionClass: "happy" },
-            { name: "Jane Smith", contact: "+987654321", emotion: "😐 Neutral", summary: "Asked about appointment availability.", emotionClass: "neutral" },
-            { name: "Mike Johnson", contact: "+112233445", emotion: "😞 Sad", summary: "Unhappy with last haircut, wants a fix.", emotionClass: "sad" }
-        ];
+        // Dynamic data from backend
+        const conversations = {{ conversations|tojson }};
+        
+        // Initial load
         loadConversations(conversations);
-
     </script>
 
+    <!-- WhatsApp icon support -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </body>
 </html>
