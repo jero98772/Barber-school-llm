@@ -6,7 +6,9 @@ from typing import List, Dict, Optional
 import uvicorn
 import json
 from openai import OpenAI
+import csv
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
 from textblob import TextBlob
@@ -127,6 +129,61 @@ async def chat(request: Request):
     
     # Return the user message immediately to confirm receipt
     return {"status": "message received", "user_message": message}
+
+@app.post("/contact")
+async def contact(request: Request):
+    """
+    Process contact form submissions from the barber chat
+    """
+    form_data = await request.json()
+    
+    # Validate required fields
+    required_fields = ['session_id', 'name', 'phone', 'city']
+    missing_fields = [field for field in required_fields if field not in form_data]
+    
+    if missing_fields:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Missing required fields: {', '.join(missing_fields)}"
+        )
+
+    # Create data directory if not exists
+    os.makedirs('data', exist_ok=True)
+    
+    # CSV file path
+    csv_file = 'data/contacts.csv'
+    
+    # File headers
+    file_headers = ['timestamp', 'session_id', 'name', 'phone', 'city', 'notes']
+    
+    # Prepare data for CSV
+    record = {
+        'timestamp': datetime.now().isoformat(),
+        'session_id': form_data['session_id'],
+        'name': form_data['name'],
+        'phone': form_data['phone'],
+        'city': form_data['city'],
+        'notes': form_data.get('notes', '')
+    }
+
+    # Write to CSV
+    file_exists = os.path.isfile(csv_file)
+    with open(csv_file, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=file_headers)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(record)
+
+    # Optional: Add to chat history
+    session_id = form_data['session_id']
+    if session_id in chat_history:
+        chat_history[session_id].append({
+            "role": "system", 
+            "content": f"User contact information: Name: {form_data['name']}, Phone: {form_data['phone']}, City: {form_data['city']}, Notes: {form_data.get('notes', '')}"
+        })
+
+    return {"status": "success", "message": "Contact information saved"}
+
 
 @app.get("/stream/{session_id}")
 async def stream_response(session_id: str, model: str = "gemini"):
