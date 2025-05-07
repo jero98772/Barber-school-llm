@@ -106,38 +106,42 @@ async def chat_answer_gemini(messages):
     except Exception as e:
         yield f"Error with Gemini API: {str(e)}"
 
+async def get_full_response(messages):
+    full_response = ""
+    async for text_chunk in chat_answer_gemini(messages):
+        print(text_chunk)
+        if text_chunk.startswith("Error with Gemini API"):
+            raise ValueError(text_chunk)
+        full_response += text_chunk
+    return full_response
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     conversations = []
-    
-    try:
-        with open('data/contacts.csv', 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            print(reader)
-            # Sentiment to emoji mapping
-            SENTIMENT_MAP = {
-                "Neutro": "😐 Neutral",
-                "Positivo": "😊 Positive",
-                "Negativo": "😞 Negative"
-            }
-            
-            for row in reader:
-                conversations.append({
-                    'name': row['name'],
-                    'contact': f"{row['phone']} ({row['city']})",
-                    'emotion': SENTIMENT_MAP.get(row['sentiment'], "😐 Neutral"),
-                    'summary': row['summary'],
-                    'emotionClass': row['sentiment'].lower().split()[0]
-                })
-            print(conversations)  
-    except FileNotFoundError:
-        print("No contact data found - using empty dataset")
-    except Exception as e:
-        print(f"Error reading CSV: {str(e)}")
+    with open('data/contacts.csv', 'r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        print(reader)
+        # Sentiment to emoji mapping
+        SENTIMENT_MAP = {
+            "Neutro": "😐 Neutral",
+            "Positivo": "😊 Positive",
+            "Negativo": "😞 Negative"
+        }
+        
+        for row in reader:
+            conversations.append({
+                'name': row['name'],
+                'contact': f"{row['phone']} ({row['city']})",
+                'emotion': SENTIMENT_MAP.get(row['sentiment'], "😐 Neutral"),
+                'summary': row['summary'],
+                'emotionClass': row['sentiment'].lower().split()[0]
+            })
+        print(conversations)  
 
     return templates.TemplateResponse(
         "dashboard.html",
@@ -193,9 +197,10 @@ async def contact(request: Request):
     get_last_user_message = lambda chat_history, chat_id: next(
     (msg['content'] for msg in reversed(chat_history.get(chat_id, [])) 
     if msg['role'] == 'user'), None)
-    chat_history['chat1'].append({"role": "systems", "content": "give me a summary of this conversation of 1 paragrph:"})
+    chat_history['chat1'].append({"role": "user", "content": "dame un resumen de esta conversacion en un parrafo"})
 
-    summary = chat_answer_gemini(chat_history)
+    summary = await get_full_response(chat_history['chat1'])#chat_answer_gemini(chat_history)
+    print(summary)
     sentiment = sentiment_analizis(get_last_user_message(chat_history, "chat1"))
     # Prepare data for CSV
     record = {

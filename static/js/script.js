@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sessionId = generateSessionId();
 
     // Add welcome message
-    addMessage("👋 Welcome to ABC Barber's Chat! How can I help you today? You can ask me about our services, prices, or book an appointment!", false);
+    addMessage("👋 ¡Bienvenido al chat de ABC Barber! ¿Cómo puedo ayudarte hoy? ¡Puedes preguntarme sobre nuestros servicios, precios o reservar una cita!", false);
 
     // Function to generate session ID
     function generateSessionId() {
@@ -120,10 +120,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 document.body.removeChild(modalBackdrop);
                 contactFormShown = false;
-                addMessage(`Thank you, ${formData.name}! We'll contact you at ${formData.phone} to confirm.`, false);
+                addMessage(`¡Gracias, ${formData.name}! Nos pondremos en contacto contigo en ${formData.phone} para confirmarlo.`, false);
             } catch (error) {
                 console.error('Error:', error);
-                addMessage('Error submitting form. Please try again.', false);
+                addMessage('Error al enviar el formulario. Por favor, inténtelo de nuevo.', false);
             }
         });
 
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cancel-form').addEventListener('click', () => {
             document.body.removeChild(modalBackdrop);
             contactFormShown = false;
-            addMessage("Appointment cancelled. Feel free to ask anything else!", false);
+            addMessage("Cita cancelada. No dude en preguntar cualquier otra cosa.", false);
         });
     }
 
